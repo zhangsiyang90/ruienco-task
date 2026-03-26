@@ -806,9 +806,10 @@ function renderTaskCard(task, colKey) {
       </div>
       <div class="mt-3">
         ${colKey === 'pending' ? 
-          `<button onclick="claimTask('${task.id}')" class="w-full btn-primary text-xs py-1.5 rounded-lg font-medium">
-            <i class="fa fa-hand-o-right mr-1"></i>认领任务
-          </button>` : 
+          `<div class="flex gap-1">
+            <button onclick="claimTask('${task.id}')" class="flex-1 btn-primary text-xs py-1.5 rounded-lg font-medium"><i class="fa fa-hand-o-right mr-1"></i>认领任务</button>
+            ${currentUser && currentUser.role==='admin' ? `<button onclick="deleteTask('${task.id}')" class="btn-danger text-xs px-3 py-1.5 rounded-lg" title="删除"><i class="fa fa-trash"></i></button>` : ''}
+          </div>` : 
           `<button onclick="showTaskDetail('${task.id}')" class="w-full border border-gray-200 text-gray-600 hover:bg-gray-50 text-xs py-1.5 rounded-lg transition-colors">
             <i class="fa fa-eye mr-1"></i>查看详情
           </button>`
@@ -985,6 +986,7 @@ function renderMyTaskCard(task) {
         ${canSubmit ? `<button onclick="openSubmitModal('${task.id}')" class="flex-1 btn-primary text-xs py-1.5 rounded-lg font-medium">
           <i class="fa fa-upload mr-1"></i>提交成果
         </button>` : ''}
+        ${currentUser && currentUser.role==='admin' ? `<button onclick="deleteTask('${task.id}')" class="btn-danger text-xs px-3 py-1.5 rounded-lg" title="删除"><i class="fa fa-trash"></i></button>` : ''}
       </div>
     </div>
   `;
