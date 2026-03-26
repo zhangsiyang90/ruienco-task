@@ -246,7 +246,7 @@ window.supabase={createClient:(u,k)=>({from:t=>new _SQ(u,k,t)})};
           <i class="fa fa-times mr-1"></i>驳回
         </button>
         <button onclick="doReview('completed')" class="btn-success px-4 py-2 rounded-lg text-sm font-medium">
-          <i class="fa fa-check mr-1"></i>通过
+          <i class="fa fa-check mr-1"></i>确认完成
         </button>
       </div>
     </div>
@@ -1028,8 +1028,7 @@ async function submitOutput() {
   }
 
   const { error: taskErr } = await supabase.from('slice_tasks').update({
-    status: 'completed',
-    completed_at: new Date().toISOString()
+    status: 'reviewing'
   }).eq('id', currentSubmitTaskId);
 
   closeModal('submitOutputModal');
@@ -1293,7 +1292,8 @@ async function doReview(action) {
   const { error } = await supabase
     .from('slice_tasks')
     .update({
-      status: action,
+      status: action === 'completed' ? 'completed' : action,
+      completed_at: action === 'completed' ? new Date().toISOString() : null,
       review_comments: comments || null
     })
     .eq('id', currentReviewTaskId);
