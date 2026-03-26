@@ -1025,10 +1025,9 @@ async function submitOutput() {
 
   const { error: outErr } = await supabase.from('slice_outputs').insert({
     task_id: currentSubmitTaskId,
-    submitter_id: currentUser.id,
+    uploader_id: currentUser.id,
     video_links: JSON.stringify([{ name: '网盘地址', url: cloudUrl }]),
-    notes: notes,
-    submitted_at: new Date().toISOString()
+    notes: notes
   });
 
   if (outErr) {
