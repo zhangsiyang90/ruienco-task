@@ -776,6 +776,7 @@ function renderKanbanBoard(tasks) {
 
 function renderTaskCard(task, colKey) {
   const publisher = allUsers[task.publisher_id];
+  if (!task) { showToast('获取任务失败，请刷新后重试', 'error'); return; }
   const assignee = task.assignee_id ? allUsers[task.assignee_id] : null;
   const overdue = isOverdue(task.deadline) && !['completed', 'rejected'].includes(task.status);
 
@@ -839,10 +840,12 @@ async function claimTask(taskId) {
 }
 
 async function showTaskDetail(taskId) {
-  const { data: task } = await supabase.from('slice_tasks').select('*').eq('id', taskId).single();
+  const { data: taskArr } = await supabase.from('slice_tasks').select('*').eq('id', taskId);
+  const task = taskArr && taskArr[0] ? taskArr[0] : null;
   if (!task) return;
 
   const publisher = allUsers[task.publisher_id];
+  if (!task) { showToast('获取任务失败，请刷新后重试', 'error'); return; }
   const assignee = task.assignee_id ? allUsers[task.assignee_id] : null;
 
   const { data: outputs } = await supabase.from('slice_outputs').select('*').eq('task_id', taskId).order('created_at', { ascending: false });
@@ -1204,6 +1207,7 @@ async function renderReview() {
 }
 
 function renderReviewCard(task) {
+  if (!task) { showToast('获取任务失败，请刷新后重试', 'error'); return; }
   const assignee = task.assignee_id ? allUsers[task.assignee_id] : null;
   const overdue = isOverdue(task.deadline);
 
@@ -1239,9 +1243,11 @@ async function openReviewModal(taskId) {
   currentReviewTaskId = taskId;
   document.getElementById('reviewComments').value = '';
 
-  const { data: task } = await supabase.from('slice_tasks').select('*').eq('id', taskId).single();
+  const { data: taskArr } = await supabase.from('slice_tasks').select('*').eq('id', taskId);
+  const task = taskArr && taskArr[0] ? taskArr[0] : null;
   const { data: outputs } = await supabase.from('slice_outputs').select('*').eq('task_id', taskId).order('created_at', { ascending: false });
 
+  if (!task) { showToast('获取任务失败，请刷新后重试', 'error'); return; }
   const assignee = task.assignee_id ? allUsers[task.assignee_id] : null;
 
   let outputsHtml = '';
