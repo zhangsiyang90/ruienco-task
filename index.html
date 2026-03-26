@@ -7,7 +7,35 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/4.7.0/css/font-awesome.min.css" />
   <script src="https://registry.npmmirror.com/chart.js/4.4.0/files/dist/chart.umd.min.js"></script>
-  <script src="https://registry.npmmirror.com/@supabase/supabase-js/2.49.4/files/dist/umd/supabase.min.js"></script>
+  <script>
+class _SQ{
+  constructor(u,k,t){this.u=u;this.k=k;this.t=t;this.f=[];this.s='*';this.l=null;this.o=null;this.sg=false;this.m='GET';this.b=null;this.sc=false;}
+  select(s){this.s=s;this.sc=true;return this;}
+  eq(c,v){this.f.push(c+'=eq.'+encodeURIComponent(v));return this;}
+  limit(n){this.l=n;return this;}
+  order(c,{ascending:a=true}={}){this.o=c+'.'+(a?'asc':'desc');return this;}
+  single(){this.sg=true;return this;}
+  insert(d){this.m='POST';this.b=JSON.stringify(Array.isArray(d)?d:[d]);return this;}
+  update(d){this.m='PATCH';this.b=JSON.stringify(d);return this;}
+  delete(){this.m='DELETE';return this;}
+  then(res){
+    let ep=this.u+'/rest/v1/'+this.t,p=[];
+    if(this.m==='GET'){p.push('select='+this.s);this.f.forEach(f=>p.push(f));if(this.l)p.push('limit='+this.l);if(this.o)p.push('order='+this.o);}
+    else{this.f.forEach(f=>p.push(f));if(this.sc)p.push('select='+this.s);}
+    if(p.length)ep+='?'+p.join('&');
+    const h={'apikey':this.k,'Authorization':'Bearer '+this.k,'Content-Type':'application/json'};
+    if(this.sg)h['Accept']='application/vnd.pgrst.object+json';
+    const pr=[];
+    if(this.m==='POST'||this.m==='PATCH')pr.push(this.sc||this.sg?'return=representation':'return=minimal');
+    if(pr.length)h['Prefer']=pr.join(',');
+    fetch(ep,{method:this.m,headers:h,body:this.b})
+      .then(r=>r.text().then(t=>{try{return t?JSON.parse(t):null;}catch(e){return null;}}))
+      .then(d=>{if(!d)return res({data:null,error:null});if(d.code)return res({data:null,error:d});res({data:this.sg?(Array.isArray(d)?d[0]:d):d,error:null});})
+      .catch(e=>res({data:null,error:e}));
+  }
+}
+window.supabase={createClient:(u,k)=>({from:t=>new _SQ(u,k,t)})};
+</script>
   <style>
     :root {
       --primary: #8B5CF6;
