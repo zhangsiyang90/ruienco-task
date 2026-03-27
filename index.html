@@ -268,7 +268,7 @@ window.supabase={createClient:(u,k)=>({from:t=>new _SQ(u,k,t)})};
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-1">角色</label>
         <select id="newUserRole" class="w-full border border-gray-200 rounded-lg p-2.5 text-sm">
-          <option value="editor">编辑</option>
+          <option value="editor">员工</option>
           <option value="admin">管理员</option>
         </select>
       </div>
@@ -381,7 +381,7 @@ async function showMainApp() {
   document.getElementById('mainApp').classList.remove('hidden');
 
   document.getElementById('sidebarUsername').textContent = currentUser.name;
-  document.getElementById('sidebarRole').textContent = currentUser.role === 'admin' ? '管理员' : '编辑';
+  document.getElementById('sidebarRole').textContent = currentUser.role === 'admin' ? '管理员' : '员工';
   document.getElementById('userAvatar').textContent = currentUser.name.charAt(0);
   document.getElementById('topUsername').textContent = currentUser.name;
 
@@ -391,7 +391,7 @@ async function showMainApp() {
     roleBadge.className = 'ml-2 px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-700';
     document.getElementById('adminNav').classList.remove('hidden');
   } else {
-    roleBadge.textContent = '编辑';
+    roleBadge.textContent = '员工';
     roleBadge.className = 'ml-2 px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700';
     document.getElementById('adminNav').classList.add('hidden');
   }
@@ -761,7 +761,7 @@ function renderWorkloadTable(period) {
             <span class="font-medium text-gray-800">${user.name}</span>
           </div>
         </td>
-        <td class="py-3 text-gray-500">${user.role === 'admin' ? '管理员' : '编辑'}</td>
+        <td class="py-3 text-gray-500">${user.role === 'admin' ? '管理员' : '员工'}</td>
         <td class="py-3 text-center font-medium">${data.total}</td>
         <td class="py-3 text-center text-green-600 font-medium">${data.completed}</td>
         <td class="py-3 text-center">
@@ -1188,7 +1188,7 @@ function renderPublish() {
             <label class="block text-sm font-medium text-gray-700 mb-1">指派给（可选）</label>
             <select id="pubAssignee" class="w-full border border-gray-200 rounded-lg p-2.5 text-sm">
               <option value="">不指派（开放认领）</option>
-              ${Object.values(allUsers).map(u => `<option value="${u.id}">${u.name} (${u.role === 'admin' ? '管理员' : '编辑'})</option>`).join('')}
+              ${Object.values(allUsers).map(u => `<option value="${u.id}">${u.name} (${u.role === 'admin' ? '管理员' : '员工'})</option>`).join('')}
             </select>
           </div>
           <div>
@@ -1455,7 +1455,7 @@ async function renderSettings() {
               </div>
               <div class="flex items-center gap-3">
                 <span class="px-2.5 py-1 rounded-full text-xs font-medium ${u.role === 'admin' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'}">
-                  ${u.role === 'admin' ? '管理员' : '编辑'}
+                  ${u.role === 'admin' ? '管理员' : '员工'}
                 </span>
                 ${u.id !== currentUser.id ? 
                   `<button onclick="deleteUser('${u.id}', '${u.name}')" class="text-red-400 hover:text-red-600 text-sm p-1 rounded hover:bg-red-50 transition-colors">
