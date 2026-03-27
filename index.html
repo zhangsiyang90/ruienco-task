@@ -1252,16 +1252,18 @@ async function openReviewModal(taskId) {
 
   let outputsHtml = '';
   if (outputs && outputs.length > 0) {
-    outputsHtml = outputs.map((o, i) => `
+    outputsHtml = outputs.map((o, i) => {
+      const videoLinks = o.video_links ? (typeof o.video_links === 'string' ? JSON.parse(o.video_links) : o.video_links) : [];
+      return `
       <div class="bg-gray-50 rounded-xl p-3 border border-gray-100">
         <div class="flex items-center justify-between mb-2">
           <span class="font-medium text-sm text-gray-700">${allUsers[o.uploader_id]?.name || '未知'} 的提交 #${i+1}</span>
           <span class="text-xs text-gray-400">${formatDate(o.created_at)}</span>
         </div>
-        ${o.video_links && o.video_links.length > 0 ? `
+        ${videoLinks && videoLinks.length > 0 ? `
           <div class="space-y-1 mb-2">
-            <div class="text-xs text-gray-500 font-medium mb-1">视频链接 (${o.video_links.length}个)：</div>
-            ${o.video_links.map(vl => `
+            <div class="text-xs text-gray-500 font-medium mb-1">视频链接 (${videoLinks.length}个)：</div>
+            ${videoLinks.map(vl => `
               <a href="${vl.url}" target="_blank" class="flex items-center gap-2 text-purple-600 hover:text-purple-800 text-sm hover:underline break-all">
                 <i class="fa fa-link text-xs flex-shrink-0"></i>
                 <span>${vl.name || vl.url}</span>
@@ -1269,7 +1271,8 @@ async function openReviewModal(taskId) {
           </div>` : '<div class="text-xs text-gray-400 mb-2">无视频链接</div>'}
         ${o.notes ? `<div class="text-xs text-gray-600 bg-white p-2 rounded-lg border"><span class="font-medium">备注：</span>${o.notes}</div>` : ''}
       </div>
-    `).join('');
+    `;
+    }).join('');
   } else {
     outputsHtml = '<div class="text-center text-gray-400 text-sm py-4">暂无提交成果</div>';
   }
