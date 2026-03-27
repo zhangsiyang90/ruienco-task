@@ -285,6 +285,35 @@ window.supabase={createClient:(u,k)=>({from:t=>new _SQ(u,k,t)})};
   </div>
 </div>
 
+<!-- Edit User Modal -->
+<div id="editUserModal" class="hidden fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4">
+  <div class="bg-white rounded-2xl w-full max-w-sm card-shadow overflow-hidden">
+    <div class="flex items-center justify-between p-5 border-b">
+      <h3 class="font-bold text-gray-800 text-lg">编辑用户</h3>
+      <button onclick="closeModal('editUserModal')" class="text-gray-400 hover:text-gray-600 text-xl">&times;</button>
+    </div>
+    <div class="p-5 space-y-4">
+      <div class="text-sm text-gray-500">用户：<span id="editUserName" class="font-medium text-gray-800"></span></div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">角色</label>
+        <select id="editUserRole" class="w-full border border-gray-200 rounded-lg p-2.5 text-sm">
+          <option value="editor">员工</option>
+          <option value="admin">管理员</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">新密码</label>
+        <input id="editUserPassword" type="password" placeholder="留空则不修改密码" class="w-full border border-gray-200 rounded-lg p-2.5 text-sm" />
+      </div>
+      <div id="editUserError" class="hidden text-red-500 text-xs bg-red-50 p-2 rounded"></div>
+    </div>
+    <div class="p-4 border-t flex justify-end gap-2">
+      <button onclick="closeModal('editUserModal')" class="px-4 py-2 text-gray-500 hover:text-gray-700 text-sm">取消</button>
+      <button onclick="saveEditUser()" class="btn-primary px-5 py-2 rounded-lg text-sm font-medium">保存</button>
+    </div>
+  </div>
+</div>
+
 <!-- Toast -->
 <div id="toast" class="hidden fixed bottom-6 right-6 z-[100] px-5 py-3 rounded-xl text-white text-sm font-medium card-shadow transition-all"></div>
 
@@ -1458,7 +1487,10 @@ async function renderSettings() {
                   ${u.role === 'admin' ? '管理员' : '员工'}
                 </span>
                 ${u.id !== currentUser.id ? 
-                  `<button onclick="deleteUser('${u.id}', '${u.name}')" class="text-red-400 hover:text-red-600 text-sm p-1 rounded hover:bg-red-50 transition-colors">
+                  `<button onclick="openEditUser('${u.id}', '${u.name}', '${u.role}')" class="text-blue-400 hover:text-blue-600 text-sm p-1 rounded hover:bg-blue-50 transition-colors" title="编辑">
+                    <i class="fa fa-pencil"></i>
+                  </button>
+                  <button onclick="deleteUser('${u.id}', '${u.name}')" class="text-red-400 hover:text-red-600 text-sm p-1 rounded hover:bg-red-50 transition-colors" title="删除">
                     <i class="fa fa-trash"></i>
                   </button>` : 
                   '<span class="text-xs text-gray-400 italic">（当前用户）</span>'}
@@ -1503,6 +1535,37 @@ async function addUser() {
   renderSettings();
 }
 
+let _editUserId = null;
+function openEditUser(userId, userName, userRole) {
+  _editUserId = userId;
+  document.getElementById('editUserName').textContent = userName;
+  document.getElementById('editUserRole').value = userRole;
+  document.getElementById('editUserPassword').value = '';
+  document.getElementById('editUserError').classList.add('hidden');
+  document.getElementById('editUserModal').classList.remove('hidden');
+}
+
+async function saveEditUser() {
+  const role = document.getElementById('editUserRole').value;
+  const password = document.getElementById('editUserPassword').value.trim();
+  const errEl = document.getElementById('editUserError');
+  errEl.classList.add('hidden');
+
+  const updates = { role };
+  if (password) updates.password = password;
+
+  const { error } = await supabase.from('slice_users').update(updates).eq('id', _editUserId);
+  if (error) {
+    errEl.textContent = '保存失败：' + error.message;
+    errEl.classList.remove('hidden');
+    return;
+  }
+  showToast('用户信息已更新');
+  closeModal('editUserModal');
+  await loadAllUsers();
+  renderSettings();
+}
+
 async function deleteUser(userId, userName) {
   if (!confirm(`确定要删除用户「${userName}」吗？此操作不可撤销。`)) return;
 
@@ -1521,7 +1584,7 @@ document.addEventListener('keydown', (e) => {
     doLogin();
   }
   if (e.key === 'Escape') {
-    ['taskDetailModal', 'submitOutputModal', 'reviewModal', 'addUserModal'].forEach(id => {
+    ['taskDetailModal', 'submitOutputModal', 'reviewModal', 'addUserModal', 'editUserModal'].forEach(id => {
       closeModal(id);
     });
   }
