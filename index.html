@@ -432,6 +432,13 @@ function navigateTo(page) {
   const content = document.getElementById('pageContent');
   content.innerHTML = '<div class="flex items-center justify-center h-40"><i class="fa fa-spinner fa-spin text-purple-400 text-2xl"></i></div>';
 
+  const adminPages = ['publish', 'review', 'settings'];
+  if (adminPages.includes(page) && (!currentUser || currentUser.role !== 'admin')) {
+    showToast('无权限：仅管理员可操作', 'error');
+    navigateTo('kanban');
+    return;
+  }
+
   switch (page) {
     case 'stats': renderStats(); break;
     case 'kanban': renderKanban(); break;
@@ -814,7 +821,7 @@ function renderTaskCard(task, colKey) {
           </div>` :
           colKey === 'reviewing' ? `
           <div class="flex gap-1">
-            <button onclick="openReviewModal('${task.id}')" class="flex-1 btn-primary text-xs py-1.5 rounded-lg font-medium"><i class="fa fa-search mr-1"></i>审核</button>
+            ${currentUser && currentUser.role==='admin' ? `<button onclick="openReviewModal('${task.id}')" class="flex-1 btn-primary text-xs py-1.5 rounded-lg font-medium"><i class="fa fa-search mr-1"></i>审核</button>` : `<button onclick="showTaskDetail('${task.id}')" class="flex-1 border border-gray-200 text-gray-600 hover:bg-gray-50 text-xs py-1.5 rounded-lg transition-colors"><i class="fa fa-eye mr-1"></i>查看详情</button>`}
             ${currentUser && currentUser.role==='admin' ? `<button onclick="deleteTask('${task.id}')" class="btn-danger text-xs px-3 py-1.5 rounded-lg" title="删除"><i class="fa fa-trash"></i></button>` : ''}
           </div>` :
           colKey === 'inProgress' ? `
