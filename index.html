@@ -1313,7 +1313,6 @@ async function doReview(action) {
     .from('slice_tasks')
     .update({
       status: action === 'completed' ? 'completed' : action,
-      completed_at: action === 'completed' ? new Date().toISOString() : null,
       review_comments: comments || null
     })
     .eq('id', currentReviewTaskId);
